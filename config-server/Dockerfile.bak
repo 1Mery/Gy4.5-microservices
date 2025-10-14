@@ -21,3 +21,8 @@ RUN mvn clean package -DskipTests
 ENTRYPOINT ["java","-jar","target/config-server-0.0.1-SNAPSHOT.jar"]
 
 #docker build -t tcell-config-server .  -> bu komutla oluşturmaya başlıyoruz
+#docker run -d -p 8989:8989 tcell-config-server
+
+docker hub a yükleme komutları
+docker tag tcell-config-server2 halitkalayci/turkcell-45-config-server
+docker push halitkalayci/turkcell-45-config-server
