@@ -1,19 +1,69 @@
-
+version: "3.8"
 
 services:
+  # CONFIG SERVER
   config-server:
-    image: halitkalayci/turkcell-45-config-server
+    image: meryemozevren/turkcell-45-config-server2
     ports:
-      - "8989:8989"
+      - "8966:8989"
+
+  # DISCOVERY SERVER (EUREKA)
   discovery-server:
-    image: halitkalayci/tcell-45-discovery-server
-    ports:
-      - "8761:8761"
-  gateway-server:
-    image: halitkalayci/tcell-45-gateway-server
-    ports:
-      - "8888:8888"
+    image: meryemozevren/turkcell-45-discovery-server
     depends_on:
       - config-server
+    ports:
+      - "8761:8761"
     environment:
-      - CONFIG_URI=http://config-server:8989    #dockerın içinde başka bir containera işaret etmek istiyorsak composeda o containerın ismi yazılmalı ve sağdaki port
+      - CONFIG_URI=http://config-server:8989
+
+  # GATEWAY SERVER
+  gateway-server:
+    image: meryemozevren/turkcell-45-gateway-server
+    depends_on:
+      - discovery-server
+    ports:
+      - "8888:8888"
+    environment:
+      - CONFIG_URI=http://config-server:8989
+      - EUREKA_URI=http://discovery-server:8761/eureka
+
+  # PRODUCT SERVICE
+  product-service:
+    image: meryemozevren/turkcell-45-product-servicet
+    depends_on:
+      - gateway-server
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_URI=http://discovery-server:8761/eureka
+
+  # ORDER SERVICE
+  order-service:
+    image: meryemozevren/turkcell-45-order-service
+    depends_on:
+      - gateway-server
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_URI=http://discovery-server:8761/eureka
+
+  # CART SERVICE
+  cart-service:
+    image: meryemozevren/turkcell-45-cart-service
+    depends_on:
+      - gateway-server
+    ports:
+      - "8083:8083"
+    environment:
+      - EUREKA_URI=http://discovery-server:8761/eureka
+
+  # PAYMENT SERVICE
+  payment-service:
+    image: meryemozevren/turkcell-45-payment-service
+    depends_on:
+      - gateway-server
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_URI=http://discovery-server:8761/eureka
