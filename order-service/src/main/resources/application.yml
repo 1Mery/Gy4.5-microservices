@@ -2,5 +2,7 @@ spring:
   application:
     name: order-service
 
-server:
-  port: 8082
+  profiles:
+    active: dev
+  config:
+    import: configserver:${CONFIG_URI:http://localhost:8989}

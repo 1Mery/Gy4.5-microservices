@@ -8,10 +8,18 @@ spring:
               uri: lb://product-service
               predicates:
                 - Path=/api/v1/products/**
-            - id: payment-service-static-route
+            - id: payment-service-route
               uri: lb://payment-service
               predicates:
                 - Path=/api/v1/payments/**
+            - id: cart-service-route
+              uri: lb://cart-service
+              predicates:
+                - Path=/api/v1/carts/**
+            - id: order-service-route
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/orders/**
 
 eureka:
   client:
@@ -19,4 +27,4 @@ eureka:
     register-with-eureka: true
 
 server:
-  port: 8887
+  port: 8888
