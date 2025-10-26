@@ -41,6 +41,22 @@ services:
     networks:
       - microservices-net
 
+  # POSTGRESQL
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: productdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - microservices-net
+
   # PRODUCT SERVICE
   product-service:
     image: meryemozevren/turkcell-45-product-service
@@ -48,6 +64,7 @@ services:
     depends_on:
       - config-server
       - discovery-server
+      - postgres
     ports:
       - "8080:8080"
     environment:
@@ -63,6 +80,7 @@ services:
     depends_on:
       - config-server
       - discovery-server
+      - postgres
     ports:
       - "8082:8082"
     environment:
@@ -100,3 +118,6 @@ services:
       - EUREKA_URI=http://discovery-server:8761/eureka/
     networks:
       - microservices-net
+
+volumes:
+  postgres_data:

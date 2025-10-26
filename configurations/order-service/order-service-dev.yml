@@ -2,3 +2,15 @@ eureka:
   client:
     service-url:
       defaultZone:  ${EUREKA_URI:http://localhost:8761/eureka/}
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/order_service
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: orderservice_db_password
+
+    jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        ddl-auto: update
+      show-sql: true
