@@ -3,7 +3,6 @@ package com.turkcell.product_service.infrastructure.persistence;
 import com.turkcell.product_service.domain.model.Product;
 import com.turkcell.product_service.domain.model.ProductId;
 import com.turkcell.product_service.domain.repository.ProductRepository;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -44,16 +43,7 @@ public class ProductRepositoryAdapter implements ProductRepository
     }
 
     @Override
-    public List<Product> findAllPaged(Integer pageIndex, Integer pageSize) {
-        return repository
-                .findAll(PageRequest.of(pageIndex, pageSize))
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
-    }
-
-    @Override
-    public void delete(ProductId productId) {
-        repository.deleteById(productId.value());
+    public void delete(Product product) {
+        repository.deleteById(product.id().value());
     }
 }

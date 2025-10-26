@@ -1,8 +1,7 @@
 spring:
   application:
     name: product-service
-
   profiles:
-    active: dev
+    active: docker
   config:
-    import: configserver:${CONFIG_URI:http://localhost:8989}
+    import: configserver:${CONFIG_URI:http://config-server:8989}
