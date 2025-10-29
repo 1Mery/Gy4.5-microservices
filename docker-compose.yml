@@ -5,6 +5,7 @@ networks:
 
 volumes:
   postgres_data:
+  kafka_data:
 
 services:
   # CONFIG SERVER
@@ -79,12 +80,15 @@ services:
         condition: service_started
       postgres:
         condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - "8080:8080"
     environment:
       - CONFIG_URI=http://config-server:8989
       - EUREKA_URI=http://discovery-server:8761/eureka/
       - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     networks:
       - microservices-net
 
@@ -99,11 +103,14 @@ services:
         condition: service_started
       postgres:
         condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - "8082:8082"
     environment:
       - CONFIG_URI=http://config-server:8989
       - EUREKA_URI=http://discovery-server:8761/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     networks:
       - microservices-net
 
@@ -116,11 +123,14 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - "8083:8083"
     environment:
       - CONFIG_URI=http://config-server:8989
       - EUREKA_URI=http://discovery-server:8761/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     networks:
       - microservices-net
 
@@ -133,10 +143,58 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - "8081:8081"
     environment:
       - CONFIG_URI=http://config-server:8989
       - EUREKA_URI=http://discovery-server:8761/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - microservices-net
+
+  # KAFKA
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_NODE_ID: "1"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_NUM_PARTITIONS: "3"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      CLUSTER_ID: "5L6g3nShT-eMCtK--X86sw"
+      KAFKA_CLUSTER_ID: "5L6g3nShT-eMCtK--X86sw"
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - microservices-net
+
+  # KAFKA UI
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    container_name: kafka-ui
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    ports:
+      - "8079:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "local"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
     networks:
       - microservices-net
