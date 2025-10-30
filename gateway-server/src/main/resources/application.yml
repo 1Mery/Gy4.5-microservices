@@ -1,21 +1,12 @@
 spring:
   application:
     name: gateway-server
-  profiles:
-    active: dev  # IntelliJ'de local çalışırken dev profilini kullanacak
+  config:
+    import: optional:configserver:${CONFIG_URI:http://config-server:8989}
 
 ---
-
 spring:
   config:
     activate:
       on-profile: dev
-    import: "configserver:http://localhost:8989"  # IntelliJ için local adres
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: docker
-    import: "configserver:http://config-server:8989"  # Docker içinden erişim
+    import: optional:configserver:${CONFIG_URI:http://localhost:8989}

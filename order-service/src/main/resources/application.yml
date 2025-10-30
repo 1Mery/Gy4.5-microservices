@@ -1,7 +1,12 @@
 spring:
   application:
     name: order-service
-  profiles:
-    active: dev
   config:
-    import: configserver:${CONFIG_URI:http://localhost:8989}
+    import: optional:configserver:${CONFIG_URI:http://config-server:8989}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import: optional:configserver:${CONFIG_URI:http://localhost:8989}
