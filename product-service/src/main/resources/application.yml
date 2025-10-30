@@ -2,11 +2,13 @@ spring:
   application:
     name: product-service
   profiles:
-    active: dev  # IntelliJ'de local çalışırken dev profilini kullanacak
----
+    active: dev  # IntelliJ (local) ortamda dev profili aktif olacak
+  config:
+    import: configserver:http://localhost:8989
 
+---
 spring:
   config:
     activate:
-      on-profile: docker
-    import: "configserver:http://config-server:8989"  # Docker içinden erişim
+      on-profile: dev
+    import: configserver:http://config-server:8989  # Docker içinden erişim
