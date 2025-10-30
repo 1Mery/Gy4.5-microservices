@@ -1,10 +1,12 @@
+server:
+  port: 8080
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/productdb
+    url: jdbc:postgresql://postgres:5432/productdb
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
-
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -17,12 +19,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+      defaultZone: ${EUREKA_URI:http://discovery-server:8761/eureka/}
 
 kafka:
   bootstrap-servers: kafka:9092
@@ -31,4 +28,3 @@ kafka:
     auto-offset-reset: earliest
     key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
