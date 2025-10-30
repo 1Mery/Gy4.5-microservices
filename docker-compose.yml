@@ -127,7 +127,7 @@ services:
       - CONFIG_URI=http://config-server:8989
       - EUREKA_URI=http://discovery-server:8761/eureka/
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=docker
 
     networks:
       - microservices-net
