@@ -38,8 +38,8 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public ProductResponse update(@PathVariable ProductId productId, @RequestBody UpdateProductRequest request) {
-        return updateProductUseCase.updateProduct(productId, request);
+    public ProductResponse update(@PathVariable UUID productId, @RequestBody UpdateProductRequest request) {
+        return updateProductUseCase.updateProduct(new ProductId(productId), request);
     }
 
     @DeleteMapping("/{productId}")
