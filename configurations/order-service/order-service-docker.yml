@@ -24,4 +24,4 @@ spring:
           group: order-service-group     # Consumer
       kafka:
         binder:
-          brokers: localhost:9094        # Kafka broker adresi
+          brokers: kafka:9092        # Kafka broker adresi
