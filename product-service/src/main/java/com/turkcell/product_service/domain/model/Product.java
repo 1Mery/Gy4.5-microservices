@@ -32,18 +32,17 @@ public class Product
         return new Product(ProductId.generate(), productName, description, money, stock);
     }
 
-    // Rehydrate (Persistence)
+    // Rehydrate
     public static Product rehydrate(ProductId id, String productName, String description, Money money, Integer stock) {
         return new Product(id, productName, description, money, stock);
     }
 
-    // Domain Behavior - Rename
+    // Domain Behavior
     public void rename(String productName) {
         validateName(productName);
         this.productName = productName;
     }
 
-    // Domain Behavior - Dispatch (stok düşürme)
     public void dispatch(Integer quantityToDispatch, UUID orderId) {
         if (quantityToDispatch == null || quantityToDispatch <= 0)
             throw new IllegalArgumentException("Quantity to dispatch must be positive.");
@@ -62,16 +61,12 @@ public class Product
         DomainEvents.raise(event);
     }
 
-
-
-    // Domain Behavior - Restock
     public void restock(Integer quantityToRestock) {
         if (quantityToRestock == null || quantityToRestock <= 0)
             throw new IllegalArgumentException("Quantity to restock must be positive.");
         this.stock += quantityToRestock;
     }
 
-    // Domain Behavior - Change Price
     public void changePrice(Money newPrice) {
         Objects.requireNonNull(newPrice, "Price cannot be null");
         this.money = newPrice;
