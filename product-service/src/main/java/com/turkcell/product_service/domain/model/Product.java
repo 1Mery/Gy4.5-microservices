@@ -1,6 +1,10 @@
 package com.turkcell.product_service.domain.model;
 
+import com.turkcell.product_service.domain.event.DomainEvents;
+import com.turkcell.product_service.domain.event.ProductDispatchedEvent;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Product
 {
@@ -17,9 +21,9 @@ public class Product
         this.money = money;
         this.stock = stock;
     }
-    // Static Factory Method (idiom)
-    public static Product create(String productName, String description, Money money, Integer stock)
-    {
+
+    // Static Factory Method
+    public static Product create(String productName, String description, Money money, Integer stock) {
         validateName(productName);
         validateDescription(description);
         Objects.requireNonNull(money, "Money cannot be null");
@@ -28,63 +32,72 @@ public class Product
         return new Product(ProductId.generate(), productName, description, money, stock);
     }
 
-    // Rehydrate method -> persist edilmiş veriyi geri yüklemek
-    public static Product rehydrate(ProductId id, String productName, String description, Money money, Integer stock)
-    {
+    // Rehydrate (Persistence)
+    public static Product rehydrate(ProductId id, String productName, String description, Money money, Integer stock) {
         return new Product(id, productName, description, money, stock);
     }
 
-    // İş yapan methodlar.
-    public void rename(String productName)
-    {
+    // Domain Behavior - Rename
+    public void rename(String productName) {
         validateName(productName);
         this.productName = productName;
     }
-    // Setter => Değer override etmek
-    // Worker => İşlem sonucu değerleri değiştiren.
-    public void dispatch(Integer quantityToDispatch)
-    {
-        if(quantityToDispatch == null || quantityToDispatch <= 0)
+
+    // Domain Behavior - Dispatch (stok düşürme)
+    public void dispatch(Integer quantityToDispatch, UUID orderId) {
+        if (quantityToDispatch == null || quantityToDispatch <= 0)
             throw new IllegalArgumentException("Quantity to dispatch must be positive.");
-        if(this.stock < quantityToDispatch)
+        if (this.stock < quantityToDispatch)
             throw new IllegalArgumentException("Insufficient stock.");
+
         this.stock -= quantityToDispatch;
+
+        ProductDispatchedEvent event = new ProductDispatchedEvent(
+                this.id.value(),
+                quantityToDispatch,
+                orderId,
+                Instant.now()
+        );
+
+        DomainEvents.raise(event);
     }
 
-    public void restock(Integer quantityToRestock)
-    {
+
+
+    // Domain Behavior - Restock
+    public void restock(Integer quantityToRestock) {
         if (quantityToRestock == null || quantityToRestock <= 0)
-            throw new IllegalArgumentException("Quantity to dispatch must be positive.");
+            throw new IllegalArgumentException("Quantity to restock must be positive.");
         this.stock += quantityToRestock;
     }
 
-    public void changePrice(Money newPrice)
-    {
+    // Domain Behavior - Change Price
+    public void changePrice(Money newPrice) {
         Objects.requireNonNull(newPrice, "Price cannot be null");
         this.money = newPrice;
     }
 
-    private static void validateStock(Integer stock)
-    {
+    // Validation Methods
+    private static void validateStock(Integer stock) {
         if (stock == null || stock <= 0)
             throw new IllegalArgumentException("Stock cannot be null or negative value");
     }
-    private static void validateDescription(String description)
-    {
-        if(description == null || description.isEmpty())
+
+    private static void validateDescription(String description) {
+        if (description == null || description.isEmpty())
             throw new IllegalArgumentException("Description cannot be null or empty");
-        if(description.length() >= 255)
+        if (description.length() >= 255)
             throw new IllegalArgumentException("Description length must be less than 255 characters");
     }
-    private static void validateName(String productName)
-    {
-        if(productName == null || productName.isEmpty())
-            throw new IllegalArgumentException("Name cannot be null or empty");
 
-        if(productName.length() >= 255)
+    private static void validateName(String productName) {
+        if (productName == null || productName.isEmpty())
+            throw new IllegalArgumentException("Name cannot be null or empty");
+        if (productName.length() >= 255)
             throw new IllegalArgumentException("Name length must be less than 255 characters");
     }
 
+    // Getters
     public ProductId id() {
         return id;
     }
