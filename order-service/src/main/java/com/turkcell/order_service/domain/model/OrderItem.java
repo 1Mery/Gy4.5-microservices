@@ -6,11 +6,11 @@ import java.util.Objects;
 public class OrderItem {
 
     private final ProductId productId;
-    private final Quantity quantity;
-    private final Money unitPrice;
-    private final Money lineTotal;  //unitPrice * quantity
+    private Quantity quantity;
+    private  Money unitPrice;
+    private  Money lineTotal;  //unitPrice * quantity
 
-    private OrderItem(ProductId productId,
+    public OrderItem(ProductId productId,
                       Quantity quantity,
                       Money unitPrice,
                       Money lineTotal) {
